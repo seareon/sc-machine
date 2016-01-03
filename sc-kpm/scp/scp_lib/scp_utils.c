@@ -24,12 +24,13 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "sc_memory_headers.h"
 
+#include "sc_helper.h"
+#include "../scp_keynodes.h"
+
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
-
-//sc_addr format_numeric;
 
 #define NUMBER_PRECISE 8
 
@@ -66,17 +67,18 @@ scp_result print_parameter_error(const char *operator_name, const char *paramete
 #ifdef SCP_MATH
 scp_result check_numeric_type(sc_memory_context *context, sc_addr param)
 {
-    //! TODO Add check for numeric type
-    return SCP_RESULT_TRUE;
+    if (sc_helper_check_arc(context, binary_float.addr, param, sc_type_arc_pos_const_perm))
+        return SCP_RESULT_TRUE;
+    return SCP_RESULT_FALSE;
 }
 #endif
 
 #ifdef SCP_MATH
-scp_result resolve_number(sc_memory_context *context, const sc_char *operator_name, const sc_char *parameter_name, scp_operand *param, double *num)
+scp_result resolve_number(sc_memory_context *context, const sc_char *operator_name, const sc_char *parameter_name, scp_operand *param, float *num)
 {
     sc_stream *stream;
-    sc_uint32 length = 0, read_length = 0;
-    sc_char *data1;
+    sc_uint32 /*length = 0,*/ read_length = 0;
+    //sc_char *data1;
 
     if (SCP_ASSIGN == param->param_type)
     {
@@ -103,20 +105,20 @@ scp_result resolve_number(sc_memory_context *context, const sc_char *operator_na
         return print_parameter_error(operator_name, parameter_name, "content reading error");
     }
 
-    sc_stream_get_length(stream, &length);
-    data1 = calloc(length, sizeof(sc_char));
-    sc_stream_read_data(stream, data1, length, &read_length);
+    //sc_stream_get_length(stream, &length);
+    //data1 = calloc(length, sizeof(sc_char));
+    sc_stream_read_data(stream, num, sizeof(float), &read_length);
     sc_stream_free(stream);
 
-    *num = atof(data1);
-    free(data1);
+    //*num = atof(data1);
+    //free(data1);
 
     return SCP_RESULT_TRUE;
 }
 #endif
 
 #ifdef SCP_MATH
-scp_result resolve_numbers_1_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, scp_operand *param2, double *num1, double *num2)
+scp_result resolve_numbers_1_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, scp_operand *param2, float *num1, float *num2)
 {
     if (SCP_RESULT_ERROR == resolve_number(context, operator_name, "Parameter 1", param1, num1))
     {
@@ -133,7 +135,7 @@ scp_result resolve_numbers_1_2(sc_memory_context *context, const sc_char *operat
 #endif
 
 #ifdef SCP_MATH
-scp_result resolve_numbers_2_3(sc_memory_context *context, const sc_char *operator_name, scp_operand *param2, scp_operand *param3, double *num2, double *num3)
+scp_result resolve_numbers_2_3(sc_memory_context *context, const sc_char *operator_name, scp_operand *param2, scp_operand *param3, float *num2, float *num3)
 {
     if (SCP_RESULT_ERROR == resolve_number(context, operator_name, "Parameter 2", param2, num2))
     {
@@ -150,26 +152,31 @@ scp_result resolve_numbers_2_3(sc_memory_context *context, const sc_char *operat
 #endif
 
 #ifdef SCP_MATH
-scp_result resolve_number_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, double *num1)
+scp_result resolve_number_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, float *num1)
 {
     return resolve_number(context, operator_name, "Parameter 2", param1, num1);
 }
 #endif
 
 #ifdef SCP_MATH
-scp_result write_link_content_number(sc_memory_context *context, double data, sc_addr link)
+scp_result write_link_content_number(sc_memory_context *context, float data, sc_addr link)
 {
     sc_stream *stream;
-    char *content = calloc(NUMBER_PRECISE, sizeof(sc_char));
-    g_snprintf(content, NUMBER_PRECISE, "%lf", data);
-    stream = sc_stream_memory_new(content, strlen(content), SC_STREAM_FLAG_READ, SC_FALSE);
+    //char *content = calloc(NUMBER_PRECISE, sizeof(sc_char));
+    //g_snprintf(content, NUMBER_PRECISE, "%lf", data);
+    //stream = sc_stream_memory_new(content, strlen(content), SC_STREAM_FLAG_READ, SC_FALSE);
+    stream = sc_stream_memory_new(&data, sizeof(float), SC_STREAM_FLAG_READ, SC_FALSE);
     if (SC_RESULT_OK != sc_memory_set_link_content(context, link, stream))
     {
-        free(content);
+        //free(content);
         sc_stream_free(stream);
         return SCP_RESULT_ERROR;
     }
-    free(content);
+    if (SCP_RESULT_FALSE == check_numeric_type(context, link))
+    {
+        sc_memory_arc_new(context, sc_type_arc_pos_const_perm, binary_float.addr, link);
+    }
+    //free(content);
     sc_stream_free(stream);
     return SCP_RESULT_TRUE;
 }
@@ -184,7 +191,7 @@ scp_result check_string_type(sc_memory_context *context, sc_addr param)
 #endif
 
 #ifdef SCP_STRING
-scp_result write_link_content_string(sc_memory_context *context, char* data, sc_addr link)
+scp_result write_link_content_string(sc_memory_context *context, char *data, sc_addr link)
 {
     sc_stream *stream;
     size_t data_len = strlen(data) + 1;
@@ -292,7 +299,8 @@ static scp_result resolve_string(sc_memory_context *context, const sc_char *oper
 #endif
 
 #ifdef SCP_STRING
-scp_result resolve_string_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param2, char **str2) {
+scp_result resolve_string_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param2, char **str2)
+{
     return resolve_string(context, operator_name, "Parameter 2", param2, str2);
 }
 #endif
@@ -318,7 +326,7 @@ scp_result resolve_strings_1_2(sc_memory_context *context, const sc_char *operat
 
 #ifdef SCP_STRING
 scp_result resolve_strings_2_3_4(sc_memory_context *context, const sc_char *operator_name, scp_operand *param2,
-                               scp_operand *param3, scp_operand *param4, char **str1, char **str2, char **str3)
+                                 scp_operand *param3, scp_operand *param4, char **str1, char **str2, char **str3)
 {
     if (SCP_RESULT_ERROR == resolve_string(context, operator_name, "Parameter 2", param2, str1))
     {

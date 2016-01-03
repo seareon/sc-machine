@@ -34,11 +34,11 @@ scp_result check_node_parameter_1(sc_memory_context *context, const sc_char *ope
 
 #ifdef SCP_MATH
 scp_result check_numeric_type(sc_memory_context *context, sc_addr param);
-scp_result resolve_number(sc_memory_context *context, const sc_char *operator_name, const sc_char *parameter_name, scp_operand *param, double *num);
-scp_result resolve_numbers_1_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, scp_operand *param2, double *num1, double *num2);
-scp_result resolve_numbers_2_3(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, scp_operand *param2, double *num1, double *num2);
-scp_result resolve_number_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, double *num1);
-scp_result write_link_content_number(sc_memory_context *context, double data, sc_addr link);
+scp_result resolve_number(sc_memory_context *context, const sc_char *operator_name, const sc_char *parameter_name, scp_operand *param, float *num);
+scp_result resolve_numbers_1_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, scp_operand *param2, float *num1, float *num2);
+scp_result resolve_numbers_2_3(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, scp_operand *param2, float *num1, float *num2);
+scp_result resolve_number_2(sc_memory_context *context, const sc_char *operator_name, scp_operand *param1, float *num1);
+scp_result write_link_content_number(sc_memory_context *context, float data, sc_addr link);
 #endif
 
 #ifdef SCP_STRING

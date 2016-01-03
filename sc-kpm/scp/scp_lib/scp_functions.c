@@ -783,7 +783,7 @@ void printIdentifier(sc_memory_context *context, sc_addr element)
     if ((sc_type_node & type) == sc_type_node || (sc_type_link & type) == sc_type_link)
     {
 
-		if (SC_RESULT_OK == sc_helper_get_system_identifier_link(context, element, &idtf))
+        if (SC_RESULT_OK == sc_helper_get_system_identifier_link(context, element, &idtf))
         {
             sc_stream *stream;
             sc_uint32 length = 0, read_length = 0;
@@ -887,8 +887,7 @@ scp_result printEl(sc_memory_context *context, scp_operand *param)
 scp_result printL(sc_memory_context *context, scp_operand *param, sc_bool new_line)
 {
     sc_stream *stream;
-    sc_uint32 length = 0, read_length = 0;
-    sc_char *data;
+    sc_uint32 read_length = 0;
     if (SC_FALSE == sc_memory_is_element(context, param->addr))
     {
         return print_error("print", "Parameter has not value");
@@ -897,21 +896,40 @@ scp_result printL(sc_memory_context *context, scp_operand *param, sc_bool new_li
     {
         return print_error("print", "Parameter is not an sc-link");
     }*/
+
+    printf("Error code: %d\n", sc_memory_get_link_content(context, param->addr, &stream));
+
     if (sc_memory_get_link_content(context, param->addr, &stream) != SC_RESULT_OK)
     {
         return print_error("print", "Content reading error");
     }
-    sc_stream_get_length(stream, &length);
-    data = calloc(length + 1, sizeof(sc_char));
-    sc_stream_read_data(stream, data, length, &read_length);
-    data[length] = '\0';
-    printf("%s", data);
-    if (SC_TRUE == new_line)
+    if (check_numeric_type(context, param->addr))
     {
-        printf("\n");
+        float num;
+        sc_stream_read_data(stream, &num, sizeof(float), &read_length);
+        sc_stream_free(stream);
+        printf("%f", num);
+        if (SC_TRUE == new_line)
+        {
+            printf("\n");
+        }
     }
-    sc_stream_free(stream);
-    free(data);
+    else
+    {
+        sc_uint32 length = 0;
+        sc_char *data;
+        sc_stream_get_length(stream, &length);
+        data = calloc(length + 1, sizeof(sc_char));
+        sc_stream_read_data(stream, data, length, &read_length);
+        data[length] = '\0';
+        printf("%s", data);
+        if (SC_TRUE == new_line)
+        {
+            printf("\n");
+        }
+        sc_stream_free(stream);
+        free(data);
+    }
     return SCP_RESULT_TRUE;
 }
 
@@ -1015,7 +1033,7 @@ scp_result contErase(sc_memory_context *context, scp_operand *param1)
 #ifdef SCP_MATH
 scp_result ifEq(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num1, num2;
+    float num1, num2;
     if (SCP_RESULT_ERROR == resolve_numbers_1_2(context, "ifEq", param1, param2, &num1, &num2))
     {
         return SCP_RESULT_ERROR;
@@ -1035,7 +1053,7 @@ scp_result ifEq(sc_memory_context *context, scp_operand *param1, scp_operand *pa
 #ifdef SCP_MATH
 scp_result ifGr(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num1, num2;
+    float num1, num2;
     if (SCP_RESULT_ERROR == resolve_numbers_1_2(context, "ifGr", param1, param2, &num1, &num2))
     {
         return SCP_RESULT_ERROR;
@@ -1055,7 +1073,7 @@ scp_result ifGr(sc_memory_context *context, scp_operand *param1, scp_operand *pa
 #ifdef SCP_MATH
 scp_result contLn(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
     if (SCP_RESULT_ERROR == resolve_number_2(context, "contLn", param2, &num))
     {
         return SCP_RESULT_ERROR;
@@ -1072,7 +1090,7 @@ scp_result contLn(sc_memory_context *context, scp_operand *param1, scp_operand *
 #ifdef SCP_MATH
 scp_result contCos(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
     if (SCP_RESULT_ERROR == resolve_number_2(context, "contCos", param2, &num))
     {
         return SCP_RESULT_ERROR;
@@ -1089,7 +1107,7 @@ scp_result contCos(sc_memory_context *context, scp_operand *param1, scp_operand 
 #ifdef SCP_MATH
 scp_result contSin(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
     if (SCP_RESULT_ERROR == resolve_number_2(context, "contSin", param2, &num))
     {
         return SCP_RESULT_ERROR;
@@ -1106,7 +1124,7 @@ scp_result contSin(sc_memory_context *context, scp_operand *param1, scp_operand 
 #ifdef SCP_MATH
 scp_result contTg(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
 
     if (SCP_RESULT_ERROR == resolve_number_2(context, "contTg", param2, &num))
     {
@@ -1124,7 +1142,7 @@ scp_result contTg(sc_memory_context *context, scp_operand *param1, scp_operand *
 #ifdef SCP_MATH
 scp_result contACos(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
 
     if (SCP_RESULT_ERROR == resolve_number_2(context, "contACos", param2, &num))
     {
@@ -1142,7 +1160,7 @@ scp_result contACos(sc_memory_context *context, scp_operand *param1, scp_operand
 #ifdef SCP_MATH
 scp_result contASin(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
     if (SCP_RESULT_ERROR == check_link_parameter_1(context, "contASin", param1))
     {
         return SCP_RESULT_ERROR;
@@ -1159,7 +1177,7 @@ scp_result contASin(sc_memory_context *context, scp_operand *param1, scp_operand
 #ifdef SCP_MATH
 scp_result contATg(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
 {
-    double num;
+    float num;
 
     if (SCP_RESULT_ERROR == check_link_parameter_1(context, "contATg", param1))
     {
@@ -1177,7 +1195,7 @@ scp_result contATg(sc_memory_context *context, scp_operand *param1, scp_operand 
 #ifdef SCP_MATH
 scp_result contAdd(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contAdd", param2, param3, &num1, &num2))
     {
         return SCP_RESULT_ERROR;
@@ -1194,7 +1212,7 @@ scp_result contAdd(sc_memory_context *context, scp_operand *param1, scp_operand 
 #ifdef SCP_MATH
 scp_result contSub(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
 
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contSub", param2, param3, &num1, &num2))
     {
@@ -1212,7 +1230,7 @@ scp_result contSub(sc_memory_context *context, scp_operand *param1, scp_operand 
 #ifdef SCP_MATH
 scp_result contMult(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
 
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contMult", param2, param3, &num1, &num2))
     {
@@ -1230,7 +1248,7 @@ scp_result contMult(sc_memory_context *context, scp_operand *param1, scp_operand
 #ifdef SCP_MATH
 scp_result contDiv(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
 
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contDiv", param2, param3, &num1, &num2))
     {
@@ -1248,7 +1266,7 @@ scp_result contDiv(sc_memory_context *context, scp_operand *param1, scp_operand 
 #ifdef SCP_MATH
 scp_result contDivInt(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
     int num1int, num2int;
 
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contDivInt", param2, param3, &num1, &num2))
@@ -1269,7 +1287,7 @@ scp_result contDivInt(sc_memory_context *context, scp_operand *param1, scp_opera
 #ifdef SCP_MATH
 scp_result contDivRem(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
     int num1int, num2int;
 
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contDivRem", param2, param3, &num1, &num2))
@@ -1291,7 +1309,7 @@ scp_result contDivRem(sc_memory_context *context, scp_operand *param1, scp_opera
 #ifdef SCP_MATH
 scp_result contPow(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
 {
-    double num1, num2;
+    float num1, num2;
 
     if (SCP_RESULT_ERROR == resolve_numbers_2_3(context, "contPow", param2, param3, &num1, &num2))
     {
@@ -1324,15 +1342,16 @@ scp_result contStringConcat(sc_memory_context *context, scp_operand *param1, scp
     size_t len1 = strlen(str1);
     size_t len2 = strlen(str2);
 
-    char * result = (char*)malloc(len1 + len2 + 1);
-    if (result == NULL) {
+    char *result = (char *)malloc(len1 + len2 + 1);
+    if (result == NULL)
+    {
         print_error("contStringConcat", "unable to allocate memory");
         free(str1);
         free(str2);
         return SCP_RESULT_ERROR;
     }
     memcpy(result, str1, len1);
-    memcpy(result+len1, str2, len2 + 1);
+    memcpy(result + len1, str2, len2 + 1);
 
     write_link_content_string(context, result, param1->addr);
 
@@ -1345,7 +1364,8 @@ scp_result contStringConcat(sc_memory_context *context, scp_operand *param1, scp
 #endif
 
 #ifdef SCP_STRING
-scp_result stringIfEq(sc_memory_context *context, scp_operand *param1, scp_operand *param2) {
+scp_result stringIfEq(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
+{
     char *str1, *str2;
     scp_result result;
 
@@ -1369,7 +1389,8 @@ scp_result stringIfEq(sc_memory_context *context, scp_operand *param1, scp_opera
 #endif
 
 #ifdef SCP_STRING
-scp_result stringIfGr(sc_memory_context *context, scp_operand *param1, scp_operand *param2) {
+scp_result stringIfGr(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
+{
     char *str1, *str2;
     scp_result result;
 
@@ -1393,7 +1414,8 @@ scp_result stringIfGr(sc_memory_context *context, scp_operand *param1, scp_opera
 #endif
 
 #ifdef SCP_STRING
-scp_result stringSplit(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3) {
+scp_result stringSplit(sc_memory_context *context, scp_operand *param1, scp_operand *param2, scp_operand *param3)
+{
     sc_addr rrel_1, nrel_substring_base_order, prev_link, link, arc;
     char *str, *delimiter_str;
     char **result_set;
@@ -1433,7 +1455,7 @@ scp_result stringSplit(sc_memory_context *context, scp_operand *param1, scp_oper
         }
         else
         {
-            arc = sc_memory_arc_new(context, sc_type_arc_common|sc_type_const, prev_link, link);
+            arc = sc_memory_arc_new(context, sc_type_arc_common | sc_type_const, prev_link, link);
             sc_memory_arc_new(context, sc_type_arc_pos_const_perm, nrel_substring_base_order, arc);
         }
         prev_link = link;
@@ -1448,7 +1470,8 @@ scp_result stringSplit(sc_memory_context *context, scp_operand *param1, scp_oper
 #endif
 
 #ifdef SCP_STRING
-scp_result stringLen(sc_memory_context *context, scp_operand *param1, scp_operand *param2) {
+scp_result stringLen(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
+{
     char *str;
 
     if (SCP_RESULT_ERROR == check_link_parameter_1(context, "stringLen", param1))
@@ -1488,7 +1511,8 @@ scp_result stringSub(sc_memory_context *context, scp_operand *param1, scp_operan
 
     char *sub_string = strstr(str1, str2);
 
-    if (sub_string != NULL) {
+    if (sub_string != NULL)
+    {
         position = sub_string - str1;
         result = SCP_RESULT_TRUE;
     }
@@ -1552,7 +1576,7 @@ scp_result stringSlice(sc_memory_context *context, scp_operand *param1, scp_oper
 
     int sub_string_length = end_index - start_index + 1;
 
-    sub_string = (char*)malloc(sub_string_length);
+    sub_string = (char *)malloc(sub_string_length);
     if (sub_string == NULL)
     {
         print_error("stringSplice", "unable to allocate memory");
@@ -1587,12 +1611,14 @@ scp_result stringStartsWith(sc_memory_context *context, scp_operand *param1, scp
     scp_result result = SCP_RESULT_FALSE;
 
     size_t len_sub = strlen(str2), len_source = strlen(str1);
-    if (len_source < len_sub) {
+    if (len_source < len_sub)
+    {
         print_error("stringStartsWith", "Length of parameter 1 should be greater than length of parameter 2");
         result = SCP_RESULT_ERROR;
     }
 
-    if (strncmp(str1, str2, len_sub) == 0) {
+    if (strncmp(str1, str2, len_sub) == 0)
+    {
         result = SCP_TRUE;
     }
 
@@ -1620,12 +1646,14 @@ scp_result stringEndsWith(sc_memory_context *context, scp_operand *param1, scp_o
     scp_result result = SCP_RESULT_FALSE;
 
     size_t len_sub = strlen(str2), len_source = strlen(str1);
-    if (len_source < len_sub) {
+    if (len_source < len_sub)
+    {
         print_error("stringEndsWith", "Length of parameter 1 should be greater than length of parameter 2");
         result = SCP_RESULT_ERROR;
     }
 
-    if (0 == strcmp(str1 + len_source - len_sub, str2)) {
+    if (0 == strcmp(str1 + len_source - len_sub, str2))
+    {
         result = SCP_TRUE;
     }
 
@@ -1658,7 +1686,8 @@ scp_result stringReplace(sc_memory_context *context, scp_operand *param1, scp_op
     len_str3 = strlen(str3);
 
     ins = source_string;
-    for (count = 0; tmp = strstr(ins, str2); ++count) {
+    for (count = 0; tmp = strstr(ins, str2); ++count)
+    {
         ins = tmp + len_str2;
     }
 
@@ -1672,7 +1701,8 @@ scp_result stringReplace(sc_memory_context *context, scp_operand *param1, scp_op
         free(str3);
         return SCP_RESULT_ERROR;
     }
-    while (count--) {
+    while (count--)
+    {
         ins = strstr(source_string, str2);
         len_front = ins - source_string;
         tmp = strncpy(tmp, source_string, len_front) + len_front;
@@ -1692,7 +1722,8 @@ scp_result stringReplace(sc_memory_context *context, scp_operand *param1, scp_op
 #endif
 
 #ifdef SCP_STRING
-scp_result stringToUpperCase(sc_memory_context *context, scp_operand *param1, scp_operand *param2) {
+scp_result stringToUpperCase(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
+{
     char *str, *result;
 
     if (SCP_RESULT_ERROR == check_link_parameter_1(context, "stringToUpperCase", param1))
@@ -1716,7 +1747,8 @@ scp_result stringToUpperCase(sc_memory_context *context, scp_operand *param1, sc
 #endif
 
 #ifdef SCP_STRING
-scp_result stringToLowerCase(sc_memory_context *context, scp_operand *param1, scp_operand *param2) {
+scp_result stringToLowerCase(sc_memory_context *context, scp_operand *param1, scp_operand *param2)
+{
     char *str, *result;
 
     if (SCP_RESULT_ERROR == check_link_parameter_1(context, "stringToUpperCase", param1))

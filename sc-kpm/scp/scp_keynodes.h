@@ -54,6 +54,8 @@ extern scp_operand nrel_system_identifier;
 extern scp_operand active_scp_operator;
 extern scp_operand active_sc_agent;
 
+extern scp_operand binary_float;
+
 //scp-program sets
 extern scp_operand formed_scp_program;
 extern scp_operand correct_scp_program;

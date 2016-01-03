@@ -49,6 +49,8 @@ scp_operand nrel_system_identifier;
 scp_operand active_scp_operator;
 scp_operand active_sc_agent;
 
+scp_operand binary_float;
+
 //scp-program sets
 scp_operand formed_scp_program;
 scp_operand correct_scp_program;
@@ -183,6 +185,7 @@ scp_result scp_keynodes_init()
     MAKE_DEFAULT_OPERAND_FIXED(nrel_authors);
     MAKE_DEFAULT_OPERAND_FIXED(active_scp_operator);
     MAKE_DEFAULT_OPERAND_FIXED(active_sc_agent);
+    MAKE_DEFAULT_OPERAND_FIXED(binary_float);
     MAKE_DEFAULT_OPERAND_FIXED(nrel_then);
     MAKE_DEFAULT_OPERAND_FIXED(nrel_else);
     MAKE_DEFAULT_OPERAND_FIXED(nrel_goto);
@@ -278,6 +281,7 @@ scp_result scp_keynodes_init()
     resolve_keynode(nrel_system_identifier.addr, "nrel_system_identifier");
     resolve_keynode(active_scp_operator.addr, "active_scp_operator");
     resolve_keynode(active_sc_agent.addr, "active_sc_agent");
+    resolve_keynode(binary_float.addr, "binary_float");
     resolve_keynode(nrel_then.addr, "nrel_then");
     resolve_keynode(nrel_else.addr, "nrel_else");
     resolve_keynode(nrel_goto.addr, "nrel_goto");
