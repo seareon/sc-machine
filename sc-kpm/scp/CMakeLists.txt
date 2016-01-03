@@ -2,6 +2,8 @@ file(GLOB_RECURSE SOURCES_C "*.c")
 file(GLOB_RECURSE SOURCES_CPP "*.cpp")
 file(GLOB_RECURSE HEADERS "*.h")
 
+list(REMOVE_ITEM SOURCES_C "test/main.c")
+
 set(SCP_ROOT ${SC_KPM_ROOT}/scp)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SC_MACHINE_ROOT}/bin/extensions)
 
@@ -16,3 +18,6 @@ include_directories("${SCP_ROOT}/scp_lib" ${SC_MEMORY_SRC} ${GLIB2_INCLUDE_DIRS}
 add_dependencies(scp sc-memory)
 
 target_link_libraries(scp sc-memory)
+
+# compile test
+add_subdirectory(test)
