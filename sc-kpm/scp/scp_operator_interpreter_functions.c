@@ -762,6 +762,9 @@ scp_result goto_conditional_unsuccess(sc_memory_context *context, scp_operand *s
 scp_result goto_conditional_error(sc_memory_context *context, scp_operand *scp_operator_node)
 {
     //!TODO Add error processing
+    scp_operand arc1;
+    MAKE_DEFAULT_ARC_ASSIGN(arc1);
+    genElStr3(context, &error_executed_scp_operator, &arc1, scp_operator_node);
     return SCP_RESULT_TRUE;
 }
 

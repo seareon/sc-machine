@@ -44,18 +44,18 @@ scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_
     {
         arc1.param_type = SCP_FIXED;
         ordinal.param_type = SCP_ASSIGN;
-        resolve_ordinal_rrel(context, &arc1, &ordinal);
+        resolve_ordinal_rrel(context, &arc1, &ordinal);     // не знаю
         ordinal.param_type = SCP_FIXED;
         arc1.param_type = SCP_ASSIGN;
         new_elem.param_type = SCP_ASSIGN;
         if (SCP_RESULT_TRUE != searchElStr5(context, call_params, &arc1, &new_elem, &arc2, &ordinal))
         {
             scp_iterator3_free(it);
-            return print_error("Illegal procedure parameter", "Call parameter missed");;
+            return print_error("Illegal procedure parameter", "Call parameter missed");
         }
         new_elem.param_type = SCP_FIXED;
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
-        g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
+        g_hash_table_steal(pattern_hash, MAKE_HASH(elem));                  // не знаю!!!!!!!!!!!!!!!!!!!!!!!!
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;

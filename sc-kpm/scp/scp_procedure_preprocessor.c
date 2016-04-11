@@ -45,7 +45,7 @@ void append_to_set(gpointer key, gpointer value, gpointer set)
 
 void gen_set_from_hash(GHashTable *table, scp_operand *set)
 {
-    g_hash_table_foreach(table, append_to_set, set);
+    g_hash_table_foreach(table, append_to_set, set);        // не знаю
 }
 
 void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *context, GHashTable *table, scp_operand *set, scp_operand *parameter_set, scp_operand *const_set, scp_operand *vars_set)
@@ -77,7 +77,7 @@ void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *cont
 
         // Operand modifiers loop
         it2 = scp_iterator3_new(context, &modifier, &arc1, &operand_arc);
-        while (SCP_RESULT_TRUE == scp_iterator3_next(context, it2, &modifier, &modifier_arc, &operand_arc))
+        while (SCP_RESULT_TRUE == scp_iterator3_next(context, it2, &modifier, &modifier_arc, &operand_arc)) // не добавляется сам модификатор, почему?
         {
             modifier.param_type = SCP_FIXED;
             modifier_arc.param_type = SCP_FIXED;
@@ -133,7 +133,7 @@ void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *cont
                 {
                     append_to_hash(table, &operand_element_modifier_arc);
                     // Constant case
-                    if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_const, &operand_element_modifier))
+                    if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_const, &operand_element_modifier))     // зачем проверка??
                     {
                         genElStr3(context, const_set, &arc1, &operand_element);
                     }
@@ -299,7 +299,7 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
         {
             curr_operand.param_type = SCP_FIXED;
             operand_arc.param_type = SCP_FIXED;
-            cop_const = SCP_FALSE;
+            cop_const = SCP_FALSE;              // повтор! Зачем?
             is_const = SCP_FALSE;
             order_rel = SCP_FALSE;
 

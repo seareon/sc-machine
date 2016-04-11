@@ -62,6 +62,7 @@ extern scp_operand prepared_scp_program;
 
 //scp-operator sets
 extern scp_operand executed_scp_operator;
+extern scp_operand error_executed_scp_operator;
 extern scp_operand successfully_executed_scp_operator;
 extern scp_operand unsuccessfully_executed_scp_operator;
 extern scp_operand scp_operator_executable_after_all_previous;

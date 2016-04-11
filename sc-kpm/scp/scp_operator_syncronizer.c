@@ -31,6 +31,7 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 sc_event *event_operator_syncronizer_goto;
 sc_event *event_operator_syncronizer_then;
 sc_event *event_operator_syncronizer_else;
+sc_event *event_operator_syncronizer_error;
 
 scp_result start_next_operator(sc_memory_context *context, scp_operand *scp_operator, scp_operand *curr_arc);
 
@@ -47,7 +48,8 @@ scp_result erase_executed_mark(sc_memory_context *context, scp_operand *scp_oper
         execute_result.param_type = SCP_FIXED;
         if (SCP_RESULT_TRUE == ifCoin(context, &execute_result, &executed_scp_operator)
             || SCP_RESULT_TRUE == ifCoin(context, &execute_result, &successfully_executed_scp_operator)
-            || SCP_RESULT_TRUE == ifCoin(context, &execute_result, &unsuccessfully_executed_scp_operator))
+            || SCP_RESULT_TRUE == ifCoin(context, &execute_result, &unsuccessfully_executed_scp_operator)
+            || SCP_RESULT_TRUE == ifCoin(context, &execute_result, &error_executed_scp_operator))
         {
             arc1.param_type = SCP_FIXED;
             arc1.erase = SCP_TRUE;
@@ -118,6 +120,24 @@ sc_result syncronize_scp_operator(const sc_event *event, sc_addr arg)
         MAKE_COMMON_ARC_ASSIGN(arc3);
         it = scp_iterator5_new(s_default_ctx, &operator_node, &arc3, &next_operator_node, &arc2, &nrel_else);
         while (SCP_RESULT_TRUE == scp_iterator5_next(s_default_ctx, it, &operator_node, &arc3, &next_operator_node, &arc2, &nrel_else))
+        {
+            arc3.param_type = SCP_FIXED;
+            next_operator_node.param_type = SCP_FIXED;
+            if (SCP_RESULT_TRUE != searchElStr3(s_default_ctx, &active_scp_operator, &arc2, &next_operator_node))
+            {
+                start_next_operator(s_default_ctx, &next_operator_node, &arc3);
+            }
+            arc3.param_type = SCP_ASSIGN;
+            next_operator_node.param_type = SCP_ASSIGN;
+        }
+        scp_iterator5_free(it);
+    }
+    else if (SCP_RESULT_TRUE == ifCoin(s_default_ctx, &execute_result, &error_executed_scp_operator))
+    {
+        MAKE_DEFAULT_ARC_ASSIGN(arc2);
+        MAKE_COMMON_ARC_ASSIGN(arc3);
+        it = scp_iterator5_new(s_default_ctx, &operator_node, &arc3, &next_operator_node, &arc2, &nrel_error);
+        while (SCP_RESULT_TRUE == scp_iterator5_next(s_default_ctx, it, &operator_node, &arc3, &next_operator_node, &arc2, &nrel_error))
         {
             arc3.param_type = SCP_FIXED;
             next_operator_node.param_type = SCP_FIXED;
@@ -271,6 +291,9 @@ scp_result scp_operator_syncronizer_init()
         return SCP_RESULT_ERROR;
     event_operator_syncronizer_else = sc_event_new(s_default_ctx, unsuccessfully_executed_scp_operator.addr, SC_EVENT_ADD_OUTPUT_ARC, 0, (fEventCallback)syncronize_scp_operator, 0);
     if (event_operator_syncronizer_else == null_ptr)
+        return SCP_RESULT_ERROR;
+    event_operator_syncronizer_error = sc_event_new(s_default_ctx, error_executed_scp_operator.addr, SC_EVENT_ADD_OUTPUT_ARC, 0, (fEventCallback)syncronize_scp_operator, 0);
+    if (event_operator_syncronizer_error == null_ptr)
         return SCP_RESULT_ERROR;
     return SCP_RESULT_TRUE;
 }

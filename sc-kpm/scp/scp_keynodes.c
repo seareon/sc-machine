@@ -57,6 +57,7 @@ scp_operand prepared_scp_program;
 
 //scp-operator sets
 scp_operand executed_scp_operator;
+scp_operand error_executed_scp_operator;
 scp_operand successfully_executed_scp_operator;
 scp_operand unsuccessfully_executed_scp_operator;
 scp_operand scp_operator_executable_after_all_previous;
@@ -173,6 +174,7 @@ scp_result scp_keynodes_init()
     MAKE_DEFAULT_OPERAND_FIXED(incorrect_scp_program);
     MAKE_DEFAULT_OPERAND_FIXED(prepared_scp_program);
     MAKE_DEFAULT_OPERAND_FIXED(executed_scp_operator);
+    MAKE_DEFAULT_OPERAND_FIXED(error_executed_scp_operator);
     MAKE_DEFAULT_OPERAND_FIXED(successfully_executed_scp_operator);
     MAKE_DEFAULT_OPERAND_FIXED(unsuccessfully_executed_scp_operator);
     MAKE_DEFAULT_OPERAND_FIXED(scp_operator_executable_after_all_previous);
@@ -257,6 +259,7 @@ scp_result scp_keynodes_init()
     resolve_keynode(incorrect_scp_program.addr, "incorrect_scp_program");
     resolve_keynode(prepared_scp_program.addr, "prepared_scp_program");
     resolve_keynode(executed_scp_operator.addr, "executed_scp_operator");
+    resolve_keynode(error_executed_scp_operator.addr, "error_executed_scp_operator");
     resolve_keynode(successfully_executed_scp_operator.addr, "successfully_executed_scp_operator");
     resolve_keynode(unsuccessfully_executed_scp_operator.addr, "unsuccessfully_executed_scp_operator");
     resolve_keynode(scp_operator_executable_after_all_previous.addr, "scp_operator_executable_after_all_previous");

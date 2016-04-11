@@ -138,8 +138,8 @@ sc_result interpreter_agent_search_operators(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //searchElStr3 case
@@ -154,8 +154,8 @@ sc_result interpreter_agent_search_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -181,7 +181,7 @@ sc_result interpreter_agent_search_operators(const sc_event *event, sc_addr arg)
             }
             case SCP_RESULT_ERROR:
             {
-                if (SCP_RESULT_TRUE != goto_conditional_error(s_default_ctx, &operator_node))
+                if (SCP_RESULT_TRUE != goto_conditional_error(s_default_ctx, &operator_node))		// SCP_RESULT_FALSE ведь этот метод не кидает
                 {
                     return SC_RESULT_ERROR;
                 }
@@ -202,8 +202,8 @@ sc_result interpreter_agent_search_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 5))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -250,13 +250,13 @@ sc_result interpreter_agent_search_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
         if (SCP_RESULT_TRUE != get_set_operands_values(s_default_ctx, sets, sets_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -304,13 +304,14 @@ sc_result interpreter_agent_search_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 5))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
         if (SCP_RESULT_TRUE != get_set_operands_values(s_default_ctx, sets, sets_values, 5))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
+
         }
 
         //Operator body
@@ -382,8 +383,8 @@ sc_result interpreter_agent_gen_operators(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //genEl case
@@ -398,8 +399,8 @@ sc_result interpreter_agent_gen_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, &operand, &operand_value, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -424,8 +425,8 @@ sc_result interpreter_agent_gen_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -450,8 +451,8 @@ sc_result interpreter_agent_gen_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 5))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -499,8 +500,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //eraseEl case
@@ -515,8 +516,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, &operand, &operand_value, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -527,8 +528,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
         }
         else
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
         return SC_RESULT_OK;
     }
@@ -545,8 +546,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -570,8 +571,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 5))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -595,8 +596,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -620,8 +621,8 @@ sc_result interpreter_agent_erase_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 5))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -669,8 +670,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //contAdd case
@@ -685,8 +686,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -710,8 +711,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -735,8 +736,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -760,8 +761,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -785,8 +786,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -810,8 +811,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -835,8 +836,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -860,8 +861,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -885,8 +886,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -932,8 +933,8 @@ sc_result interpreter_agent_content_arithmetic_operators(const sc_event *event, 
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1005,8 +1006,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //contSin case
@@ -1021,8 +1022,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1046,8 +1047,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1071,8 +1072,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1096,8 +1097,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1121,8 +1122,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1146,8 +1147,8 @@ sc_result interpreter_agent_content_trig_operators(const sc_event *event, sc_add
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1196,8 +1197,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //contStringConcat case
@@ -1212,8 +1213,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1238,8 +1239,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1286,8 +1287,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1334,8 +1335,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1360,8 +1361,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1386,8 +1387,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 3))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1437,8 +1438,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 4))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1463,8 +1464,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1514,8 +1515,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1565,8 +1566,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 4))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1591,8 +1592,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1618,8 +1619,8 @@ sc_result interpreter_agent_content_string_operators(const sc_event *event, sc_a
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1669,8 +1670,8 @@ sc_result interpreter_agent_if_operators(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //ifVarAssign case
@@ -1692,8 +1693,8 @@ sc_result interpreter_agent_if_operators(const sc_event *event, sc_addr arg)
             {
                 printEl(s_default_ctx, &operand);
                 print_error("scp-operator interpreting", "Constant has ASSIGN modifier");
-                operator_interpreting_crash(s_default_ctx, &operator_node);
-                return SCP_RESULT_ERROR;
+                goto_conditional_error(s_default_ctx, &operator_node);
+                return SC_RESULT_OK;
             }
             res = ifVarAssign(s_default_ctx, &operand);
         }
@@ -1761,8 +1762,8 @@ sc_result interpreter_agent_if_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, &operands, &operand_values, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1808,8 +1809,8 @@ sc_result interpreter_agent_if_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, &operands, &operand_values, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1856,8 +1857,8 @@ sc_result interpreter_agent_if_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1927,8 +1928,8 @@ sc_result interpreter_agent_other_operators(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //varAssign case
@@ -1943,8 +1944,8 @@ sc_result interpreter_agent_other_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1968,8 +1969,8 @@ sc_result interpreter_agent_other_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 2))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -1993,8 +1994,8 @@ sc_result interpreter_agent_other_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, &operands, &operand_values, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -2040,8 +2041,8 @@ sc_result interpreter_agent_return_operator(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //return case
@@ -2096,8 +2097,8 @@ sc_result interpreter_agent_call_operator(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //call case
@@ -2239,8 +2240,8 @@ sc_result interpreter_agent_call_operator(const sc_event *event, sc_addr arg)
                 {
                     print_error("scp-operator interpreting", "In-parameter has ASSIGN modifier");
                     printf("wrong call parameter - %d\n", ordinal_index);
-                    operator_interpreting_crash(s_default_ctx, &operator_node);
-                    return SC_RESULT_ERROR;
+                    goto_conditional_error(s_default_ctx, &operator_node);
+                    return SC_RESULT_OK;
                 }
                 if (operand_type == SCP_CONST)
                 {
@@ -2253,8 +2254,8 @@ sc_result interpreter_agent_call_operator(const sc_event *event, sc_addr arg)
                     {
                         print_error("scp-operator interpreting", "Variable has FIXED modifier, but has no value");
                         printf("wrong call parameter - %d\n", ordinal_index);
-                        operator_interpreting_crash(s_default_ctx, &operator_node);
-                        return SC_RESULT_ERROR;
+                        goto_conditional_error(s_default_ctx, &operator_node);
+                        return SC_RESULT_OK;
                     }
                     value.param_type = SCP_FIXED;
                     genElStr5(s_default_ctx, &new_params_node, &arc1, &value, &arc2, &curr_ordinal);
@@ -2272,8 +2273,8 @@ sc_result interpreter_agent_call_operator(const sc_event *event, sc_addr arg)
                     {
                         print_error("scp-operator interpreting", "Variable has FIXED modifier, but has no value");
                         printf("wrong call parameter - %d\n", ordinal_index);
-                        operator_interpreting_crash(s_default_ctx, &operator_node);
-                        return SC_RESULT_ERROR;
+                        goto_conditional_error(s_default_ctx, &operator_node);
+                        return SC_RESULT_OK;
                     }
                 }
                 genElStr5(s_default_ctx, &new_params_node, &arc1, &param, &arc2, &curr_ordinal);
@@ -2323,8 +2324,8 @@ sc_result interpreter_agent_waitReturn_operators(const sc_event *event, sc_addr 
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //waitReturn case
@@ -2530,8 +2531,8 @@ sc_result interpreter_agent_event_operators(const sc_event *event, sc_addr arg)
     {
         printEl(s_default_ctx, &operator_node);
         print_error("scp-operator interpreting", "Can't resolve operator type");
-        operator_interpreting_crash(s_default_ctx, &operator_node);
-        return SC_RESULT_ERROR;
+        goto_conditional_error(s_default_ctx, &operator_node);
+        return SC_RESULT_OK;
     }
 
     //sys_wait case
@@ -2598,8 +2599,8 @@ sc_result interpreter_agent_print_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -2620,8 +2621,8 @@ sc_result interpreter_agent_print_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
@@ -2642,8 +2643,8 @@ sc_result interpreter_agent_print_operators(const sc_event *event, sc_addr arg)
 
         if (SCP_RESULT_TRUE != get_operands_values(s_default_ctx, operands, operand_values, 1))
         {
-            operator_interpreting_crash(s_default_ctx, &operator_node);
-            return SC_RESULT_ERROR;
+            goto_conditional_error(s_default_ctx, &operator_node);
+            return SC_RESULT_OK;
         }
 
         //Operator body
