@@ -31,7 +31,7 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 
 sc_event *event_program_iterpretation;
 
-scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_operand *call_params, GHashTable *table, GHashTable *pattern_hash)
+scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_operand *call_params, GHashTable *table/*, GHashTable *pattern_hash*/)
 {
     scp_operand arc1, arc2, elem, new_elem, ordinal;
     scp_iterator3 *it;
@@ -44,7 +44,7 @@ scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_
     {
         arc1.param_type = SCP_FIXED;
         ordinal.param_type = SCP_ASSIGN;
-        resolve_ordinal_rrel(context, &arc1, &ordinal);     // не знаю
+        resolve_ordinal_rrel(context, &arc1, &ordinal);
         ordinal.param_type = SCP_FIXED;
         arc1.param_type = SCP_ASSIGN;
         new_elem.param_type = SCP_ASSIGN;
@@ -55,13 +55,13 @@ scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_
         }
         new_elem.param_type = SCP_FIXED;
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
-        g_hash_table_steal(pattern_hash, MAKE_HASH(elem));                  // не знаю!!!!!!!!!!!!!!!!!!!!!!!!
+ //       g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
 }
 
-scp_result copy_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table, GHashTable *pattern_hash)
+scp_result copy_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table/*, GHashTable *pattern_hash*/)
 {
     scp_operand arc1, elem;
     scp_iterator3 *it;
@@ -75,17 +75,19 @@ scp_result copy_const_set(sc_memory_context *context, scp_operand *set, GHashTab
             continue;
         }
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(elem));
-        g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
+ //       g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
 }
 
-scp_result copy_var_set(sc_memory_context *context, scp_operand *set, GHashTable *table, GHashTable *pattern_hash)
+scp_result copy_var_set(sc_memory_context *context, scp_operand *set, GHashTable *table/*, GHashTable *pattern_hash*/)
 {
-    scp_operand arc1, elem, new_elem;
+    scp_operand arc, arc1, arc2, elem, new_elem;
     scp_iterator3 *it;
+    MAKE_DEFAULT_ARC_ASSIGN(arc);
     MAKE_DEFAULT_ARC_ASSIGN(arc1);
+    MAKE_DEFAULT_ARC_ASSIGN(arc2);
     MAKE_DEFAULT_OPERAND_ASSIGN(elem);
     MAKE_DEFAULT_NODE_ASSIGN(new_elem);
     new_elem.element_type = new_elem.element_type | scp_type_var;
@@ -98,13 +100,13 @@ scp_result copy_var_set(sc_memory_context *context, scp_operand *set, GHashTable
         }
         genEl(context, &new_elem);
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
-        g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
+   //     g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
 }
 
-scp_result copy_copying_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table, GHashTable *pattern_hash)
+scp_result copy_copying_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table/*, GHashTable *pattern_hash*/)
 {
     scp_operand arc1, elem, new_elem;
     scp_iterator3 *it;
@@ -121,7 +123,7 @@ scp_result copy_copying_const_set(sc_memory_context *context, scp_operand *set, 
         }
         genEl(context, &new_elem);
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
-        g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
+  //      g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
@@ -253,33 +255,46 @@ sc_result create_scp_process(const sc_event *event, sc_addr arg)
     MAKE_COMMON_ARC_ASSIGN(arc3);
 
     MAKE_DEFAULT_OPERAND_ASSIGN(vars_set);
-    searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &vars_set, &arc2, &nrel_scp_program_var);
-    vars_set.param_type = SCP_FIXED;
+    if(SCP_RESULT_TRUE == searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &vars_set, &arc2, &nrel_scp_program_var)) {
+        vars_set.param_type = SCP_FIXED;
+    }
+    else {
+        return SC_RESULT_ERROR;
+    }
     MAKE_DEFAULT_OPERAND_ASSIGN(consts_set);
-    searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &consts_set, &arc2, &nrel_scp_program_const);
-    consts_set.param_type = SCP_FIXED;
+    if(SCP_RESULT_TRUE == searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &consts_set, &arc2, &nrel_scp_program_const)) {
+        consts_set.param_type = SCP_FIXED;
+    }
+    else {
+        return SC_RESULT_ERROR;
+    }
     MAKE_DEFAULT_OPERAND_ASSIGN(params_set);
-    searchElStr5(s_default_ctx, &scp_procedure_node, &arc2, &params_set, &arc2, &rrel_params);
-    params_set.param_type = SCP_FIXED;
+    if(SCP_RESULT_TRUE == searchElStr5(s_default_ctx, &scp_procedure_node, &arc2, &params_set, &arc2, &rrel_params)) {
+        params_set.param_type = SCP_FIXED;
+    }
     MAKE_DEFAULT_OPERAND_ASSIGN(copying_pattern);
-    searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &copying_pattern, &arc2, &nrel_template_of_scp_process_creation);
-    copying_pattern.param_type = SCP_FIXED;
+    if(SCP_RESULT_TRUE == searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &copying_pattern, &arc2, &nrel_template_of_scp_process_creation)) {
+        copying_pattern.param_type = SCP_FIXED;
+    }
+    else {
+        return SC_RESULT_ERROR;
+    }
 
     load_set_to_hash(s_default_ctx, &copying_pattern, pattern_hash);
 
-    if (SCP_RESULT_TRUE != copy_parameter_set(s_default_ctx, &params_set, &call_parameters, copies_hash, pattern_hash))
+    if (SCP_RESULT_TRUE != copy_parameter_set(s_default_ctx, &params_set, &call_parameters, copies_hash/*, pattern_hash*/))
     {
         return SC_RESULT_OK;
     }
-    if (SCP_RESULT_TRUE != copy_var_set(s_default_ctx, &vars_set, copies_hash, pattern_hash))
+    if (SCP_RESULT_TRUE != copy_var_set(s_default_ctx, &vars_set, copies_hash/*, pattern_hash*/))
     {
         return SC_RESULT_OK;
     }
-    if (SCP_RESULT_TRUE != copy_copying_const_set(s_default_ctx, &vars_set, copies_hash, pattern_hash))
+    if (SCP_RESULT_TRUE != copy_copying_const_set(s_default_ctx, &vars_set, copies_hash/*, pattern_hash*/))
     {
         return SC_RESULT_OK;
     }
-    if (SCP_RESULT_TRUE != copy_const_set(s_default_ctx, &consts_set, copies_hash, pattern_hash))
+    if (SCP_RESULT_TRUE != copy_const_set(s_default_ctx, &consts_set, copies_hash/*, pattern_hash*/))
     {
         return SC_RESULT_OK;
     }
@@ -288,12 +303,14 @@ sc_result create_scp_process(const sc_event *event, sc_addr arg)
     MAKE_DEFAULT_ARC_ASSIGN(arc2);
     MAKE_DEFAULT_NODE_ASSIGN(scp_process_node);
     scp_procedure_node.param_type = SCP_FIXED;
-    genElStr5(s_default_ctx, &question_node, &arc1, &scp_process_node, &arc2, &nrel_scp_process);
-    scp_process_node.param_type = SCP_FIXED;
+    if(SCP_RESULT_TRUE == genElStr5(s_default_ctx, &question_node, &arc1, &scp_process_node, &arc2, &nrel_scp_process)) {
+        scp_process_node.param_type = SCP_FIXED;
+    }
     MAKE_DEFAULT_ARC_ASSIGN(arc1);
     genElStr3(s_default_ctx, &scp_process, &arc1, &scp_process_node);
 
     searchElStr5(s_default_ctx, &scp_procedure_node, &arc1, &node1, &arc2, &rrel_operators);
+
     g_hash_table_insert(copies_hash, MAKE_HASH(node1), MAKE_HASH(scp_process_node));
     g_hash_table_steal(pattern_hash, MAKE_HASH(node1));
 
@@ -311,7 +328,7 @@ sc_result create_scp_process(const sc_event *event, sc_addr arg)
 
     MAKE_DEFAULT_OPERAND_ASSIGN(init_operator);
     it = scp_iterator5_new(s_default_ctx, &scp_process_node, &arc1, &init_operator, &arc2, &rrel_init);
-    while (SCP_RESULT_TRUE == scp_iterator5_next(s_default_ctx, it, &scp_process_node, &arc1, &init_operator, &arc2, &rrel_init))
+    while (SCP_RESULT_TRUE == scp_iterator5_next(s_default_ctx, it, &scp_process_node, &arc1, &init_operator, &arc2, &rrel_init))       // не заходит??
     {
         init_flag = SC_FALSE;
         init_operator.param_type = SCP_FIXED;

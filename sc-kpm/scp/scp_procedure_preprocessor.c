@@ -45,16 +45,18 @@ void append_to_set(gpointer key, gpointer value, gpointer set)
 
 void gen_set_from_hash(GHashTable *table, scp_operand *set)
 {
-    g_hash_table_foreach(table, append_to_set, set);        // не знаю
+    g_hash_table_foreach(table, append_to_set, set);
 }
 
-void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *context, GHashTable *table, scp_operand *set, scp_operand *parameter_set, scp_operand *const_set, scp_operand *vars_set)
+void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *context/*, GHashTable *table*/, scp_operand *set, scp_operand *parameter_set, scp_operand *const_set, scp_operand *vars_set)
 {
-    scp_operand arc1, arc2, curr_operand, operand_arc, modifier, modifier_arc,
+    scp_operand arc, arc1, arc2, arc3, curr_operand, operand_arc, modifier, modifier_arc,
                 operand_element, operand_element_arc, operand_element_modifier, operand_element_modifier_arc;
     scp_iterator3 *it1, *it2, *it3;
+    MAKE_DEFAULT_ARC_ASSIGN(arc);
     MAKE_DEFAULT_ARC_ASSIGN(arc1);
     MAKE_DEFAULT_ARC_ASSIGN(arc2);
+    MAKE_DEFAULT_ARC_ASSIGN(arc3);
     MAKE_DEFAULT_ARC_ASSIGN(operand_arc);
     MAKE_DEFAULT_ARC_ASSIGN(modifier_arc);
     MAKE_DEFAULT_ARC_ASSIGN(operand_element_arc);
@@ -71,18 +73,17 @@ void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *cont
     {
         curr_operand.param_type = SCP_FIXED;
         operand_arc.param_type = SCP_FIXED;
-
-        append_to_hash(table, &curr_operand);
-        append_to_hash(table, &operand_arc);
+ //       append_to_hash(table, &curr_operand);
+  //      append_to_hash(table, &operand_arc);      //!!!!!!!!!!!!!!!!!!!
 
         // Operand modifiers loop
         it2 = scp_iterator3_new(context, &modifier, &arc1, &operand_arc);
-        while (SCP_RESULT_TRUE == scp_iterator3_next(context, it2, &modifier, &modifier_arc, &operand_arc)) // не добавляется сам модификатор, почему?
+        while (SCP_RESULT_TRUE == scp_iterator3_next(context, it2, &modifier, &modifier_arc, &operand_arc))
         {
             modifier.param_type = SCP_FIXED;
             modifier_arc.param_type = SCP_FIXED;
 
-            append_to_hash(table, &modifier_arc);
+  //          append_to_hash(table, &modifier_arc); //!!!!!!!!!!!!!!!!!!!!
 
             modifier_arc.param_type = SCP_ASSIGN;
             modifier.param_type = SCP_ASSIGN;
@@ -96,8 +97,8 @@ void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *cont
             operand_element.param_type = SCP_FIXED;
             operand_element_arc.param_type = SCP_FIXED;
 
-            append_to_hash(table, &operand_element);
-            append_to_hash(table, &operand_element_arc);
+   //         append_to_hash(table, &operand_element);
+   //         append_to_hash(table, &operand_element_arc);  //!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             // Operand element modifiers loop
             it3 = scp_iterator3_new(context, &operand_element_modifier, &operand_element_modifier_arc, &operand_element_arc);
@@ -117,23 +118,20 @@ void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *cont
                         }
                         genElStr3(context, &rrel_scp_const, &arc1, &operand_element_arc);
 
-                        arc1.param_type = SCP_FIXED;
-                        append_to_hash(table, &arc1);
-                        arc1.param_type = SCP_ASSIGN;
-
+     //                   append_to_hash(table, &arc1);  //!!!!!!!!!!!!!!!!!!
                         genElStr3(context, const_set, &arc1, &operand_element);
                     }
                     else
                     {
-                        append_to_hash(table, &operand_element_modifier_arc);
+       //                 append_to_hash(table, &operand_element_modifier_arc); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         genElStr3(context, vars_set, &arc1, &operand_element);
                     }
                 }
                 else
                 {
-                    append_to_hash(table, &operand_element_modifier_arc);
+       //             append_to_hash(table, &operand_element_modifier_arc);  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
                     // Constant case
-                    if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_const, &operand_element_modifier))     // зачем проверка??
+                    if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_const, &operand_element_modifier))
                     {
                         genElStr3(context, const_set, &arc1, &operand_element);
                     }
@@ -157,10 +155,12 @@ void append_all_relation_elements_to_hash_with_modifiers(sc_memory_context *cont
 
 void append_all_set_elements_to_hash_with_modifiers(sc_memory_context *context, GHashTable *table, scp_operand *set, scp_operand *parameter_set, scp_operand *const_set, scp_operand *vars_set)
 {
-    scp_operand arc1, arc2, curr_operand, operand_arc, modifier, modifier_arc;
+    scp_operand arc, arc1, arc2, arc3, curr_operand, operand_arc, modifier, modifier_arc;
     scp_iterator3 *it1, *it2;
+    MAKE_DEFAULT_ARC_ASSIGN(arc);
     MAKE_DEFAULT_ARC_ASSIGN(arc1);
     MAKE_DEFAULT_ARC_ASSIGN(arc2);
+    MAKE_DEFAULT_ARC_ASSIGN(arc3);
     MAKE_DEFAULT_ARC_ASSIGN(operand_arc);
     MAKE_DEFAULT_ARC_ASSIGN(modifier_arc);
     modifier_arc.erase = SCP_TRUE;
@@ -173,8 +173,8 @@ void append_all_set_elements_to_hash_with_modifiers(sc_memory_context *context, 
         curr_operand.param_type = SCP_FIXED;
         operand_arc.param_type = SCP_FIXED;
 
-        append_to_hash(table, &curr_operand);
-        append_to_hash(table, &operand_arc);
+ //       append_to_hash(table, &curr_operand);
+  //      append_to_hash(table, &operand_arc);  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         // Operand modifiers loop
         it2 = scp_iterator3_new(context, &modifier, &modifier_arc, &operand_arc);
@@ -194,21 +194,21 @@ void append_all_set_elements_to_hash_with_modifiers(sc_memory_context *context, 
                     }
                     genElStr3(context, &rrel_scp_const, &arc1, &operand_arc);
 
-                    arc1.param_type = SCP_FIXED;
-                    append_to_hash(table, &arc1);
-                    arc1.param_type = SCP_ASSIGN;
+    //                append_to_hash(table, &arc1);  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                     genElStr3(context, const_set, &arc1, &curr_operand);
                 }
                 else
                 {
-                    append_to_hash(table, &modifier_arc);
+      //               append_to_hash(table, &modifier_arc); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!;
+      //               genElStr5(context, vars_set, &arc, &modifier_arc, &arc3, &(ordinal_rrels[1]));
                     genElStr3(context, vars_set, &arc1, &curr_operand);
+     //                genElStr5(context, vars_set, &arc, &curr_operand, &arc3, &(ordinal_rrels[0]));
                 }
             }
             else
             {
-                append_to_hash(table, &modifier_arc);
+                append_to_hash(table, &modifier_arc);       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // Constant case
                 if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_const, &modifier))
                 {
@@ -229,14 +229,16 @@ void append_all_set_elements_to_hash_with_modifiers(sc_memory_context *context, 
 
 scp_result gen_system_structures(sc_memory_context *context, scp_operand *operator_set, scp_operand *parameter_set, scp_operand *vars_set, scp_operand *const_set, scp_operand *copying_consts_set, scp_operand *operators_copying_pattern)
 {
-    scp_operand arc1, arc2, curr_operator, operator_arc, operator_type, operator_input, curr_operand, operand_arc, modifier, modifier_arc,
+    scp_operand arc, arc1, arc2, arc3, curr_operator, operator_arc, operator_type, operator_input, curr_operand, operand_arc, modifier, modifier_arc,
                 operand_arc_pattern;
     scp_iterator3 *it, *it1, *it2;
     GHashTable *table = g_hash_table_new(NULL, NULL);
     scp_bool cop_const = SCP_FALSE, is_const = SCP_FALSE, order_rel = SCP_FALSE;
 
+    MAKE_DEFAULT_ARC_ASSIGN(arc);
     MAKE_DEFAULT_ARC_ASSIGN(arc1);
     MAKE_DEFAULT_ARC_ASSIGN(arc2);
+    MAKE_DEFAULT_ARC_ASSIGN(arc3);
     MAKE_DEFAULT_ARC_ASSIGN(operator_arc);
     MAKE_DEFAULT_OPERAND_ASSIGN(operand_arc);
     MAKE_DEFAULT_ARC_ASSIGN(modifier_arc);
@@ -249,7 +251,7 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
     MAKE_DEFAULT_OPERAND_ASSIGN(modifier);
     MAKE_DEFAULT_OPERAND_FIXED(operand_arc_pattern);
     operand_arc_pattern.element_type = scp_type_arc_common | scp_type_const;
-    append_to_hash(table, operator_set);
+ //   append_to_hash(table, operator_set);      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     it = scp_iterator3_new(context, operator_set, &operator_arc, &curr_operator);
     while (SCP_RESULT_TRUE == scp_iterator3_next(context, it, operator_set, &operator_arc, &curr_operator))
     {
@@ -258,11 +260,11 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
 
         if (SCP_RESULT_TRUE == searchElStr3(context, &rrel_init, &arc1, &operator_arc))
         {
-            append_to_hash(table, &arc1);
+            append_to_hash(table, &arc1);  //!!!!!!!!!!!
         }
 
-        append_to_hash(table, &curr_operator);
-        append_to_hash(table, &operator_arc);
+        append_to_hash(table, &curr_operator);        //!!!!!!!!!!!!!!!!
+  //      append_to_hash(table, &operator_arc);     //!!!!!!!!!!!!!!!!!!!!
 
         // Operator type loop
         operator_type.param_type = SCP_ASSIGN;
@@ -274,16 +276,16 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
 
             if (SCP_RESULT_TRUE == searchElStr3(context, &scp_operator_atomic_type, &arc2, &operator_input))
             {
-                append_to_hash(table, &arc1);
+                append_to_hash(table, &arc1); //!!!!!!!!!!!!!!
                 operator_type.addr = operator_input.addr;
                 operator_input.param_type = SCP_ASSIGN;
                 continue;
             }
 
-            if (SCP_RESULT_TRUE == ifCoin(context, &scp_operator_executable_after_all_previous, &operator_input)
+            if (SCP_RESULT_TRUE == ifCoin(context, &scp_operator_executable_after_all_previous, &operator_input)            // в тестах по этой ветке ниразу не шёл
                 || SCP_RESULT_TRUE == ifCoin(context, &scp_operator_executable_after_one_of_previous, &operator_input))
             {
-                append_to_hash(table, &arc1);
+    //            append_to_hash(table, &arc1); //!!!!!!!!!!!
                 operator_input.param_type = SCP_ASSIGN;
                 continue;
             }
@@ -299,7 +301,7 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
         {
             curr_operand.param_type = SCP_FIXED;
             operand_arc.param_type = SCP_FIXED;
-            cop_const = SCP_FALSE;              // повтор! Зачем?
+            cop_const = SCP_FALSE;
             is_const = SCP_FALSE;
             order_rel = SCP_FALSE;
 
@@ -319,8 +321,8 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
                 }
             }
 
-            append_to_hash(table, &curr_operand);
-            append_to_hash(table, &operand_arc);
+ //           append_to_hash(table, &curr_operand);
+  //          append_to_hash(table, &operand_arc); //!!!!!!!!
 
             // Operand modifiers loop
             it2 = scp_iterator3_new(context, &modifier, &modifier_arc, &operand_arc);
@@ -336,7 +338,7 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
                         || SCP_TRUE == ifCoin(context, &nrel_then, &modifier)
                         || SCP_TRUE == ifCoin(context, &nrel_error, &modifier))
                     {
-                        append_to_hash(table, &modifier_arc);
+                        append_to_hash(table, &modifier_arc);  //!!!!!!!!!!!!!!!!!!
                         modifier_arc.param_type = SCP_ASSIGN;
                         modifier.param_type = SCP_ASSIGN;
                         break;
@@ -360,7 +362,7 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
                     ((SCP_RESULT_TRUE == ifCoin(context, &modifier, ordinal_rrels + 2)) || (SCP_RESULT_TRUE == ifCoin(context, &modifier, ordinal_rrels + 3))))
                 {
                     cop_const = SCP_TRUE;
-                    append_all_relation_elements_to_hash_with_modifiers(context, table, &curr_operand, parameter_set, const_set, vars_set);
+                    append_all_relation_elements_to_hash_with_modifiers(context,/* table,*/ &curr_operand, parameter_set, const_set, vars_set);
                 }
 
                 // Variable case
@@ -374,22 +376,23 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
                         }
                         genElStr3(context, &rrel_scp_const, &arc1, &operand_arc);
 
-                        arc1.param_type = SCP_FIXED;
-                        append_to_hash(table, &arc1);
-                        arc1.param_type = SCP_ASSIGN;
+       //                 arc1.param_type = SCP_FIXED;
+       //                 append_to_hash(table, &arc1); //!!!!!!!!!!!!
+     //                   arc1.param_type = SCP_ASSIGN;
 
-                        genElStr3(context, const_set, &arc1, &curr_operand);
+                        genElStr3(context, const_set, &arc1, &curr_operand);        // достать текущий операнд из vars_set??
+
                     }
                     else
                     {
-                        append_to_hash(table, &modifier_arc);
+                        append_to_hash(table, &modifier_arc); //!!!!!!!!!!!!
                         genElStr3(context, vars_set, &arc1, &curr_operand);
                     }
                 }
                 else
                 {
                     //!TODO Check unnesseccary arcs
-                    append_to_hash(table, &modifier_arc);
+                    append_to_hash(table, &modifier_arc);  //!!!!!!!!!!!!!!!!!!
                     // Constant case
                     if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_const, &modifier))
                     {
@@ -438,6 +441,7 @@ scp_result gen_system_structures(sc_memory_context *context, scp_operand *operat
     //printEl(context, vars_set);printEl(context, vars_set);
     //printEl(context, const_set);
     //printf("SIZE: %d\n", g_hash_table_size(table));
+ //   gen_set_from_hash(table, operators_copying_pattern);
     gen_set_from_hash(table, operators_copying_pattern);
     g_hash_table_destroy(table);
     return SCP_RESULT_TRUE;
