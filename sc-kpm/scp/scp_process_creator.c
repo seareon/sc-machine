@@ -31,7 +31,7 @@ along with OSTIS.  If not, see <http://www.gnu.org/licenses/>.
 
 sc_event *event_program_iterpretation;
 
-scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_operand *call_params, GHashTable *table/*, GHashTable *pattern_hash*/)
+scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_operand *call_params, GHashTable *table)
 {
     scp_operand arc1, arc2, elem, new_elem, ordinal;
     scp_iterator3 *it;
@@ -55,13 +55,12 @@ scp_result copy_parameter_set(sc_memory_context *context, scp_operand *set, scp_
         }
         new_elem.param_type = SCP_FIXED;
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
- //       g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
 }
 
-scp_result copy_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table/*, GHashTable *pattern_hash*/)
+scp_result copy_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table)
 {
     scp_operand arc1, elem;
     scp_iterator3 *it;
@@ -75,13 +74,12 @@ scp_result copy_const_set(sc_memory_context *context, scp_operand *set, GHashTab
             continue;
         }
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(elem));
- //       g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
 }
 
-scp_result copy_var_set(sc_memory_context *context, scp_operand *set, GHashTable *table/*, GHashTable *pattern_hash*/)
+scp_result copy_var_set(sc_memory_context *context, scp_operand *set, GHashTable *table)
 {
     scp_operand arc, arc1, arc2, elem, new_elem;
     scp_iterator3 *it;
@@ -100,13 +98,12 @@ scp_result copy_var_set(sc_memory_context *context, scp_operand *set, GHashTable
         }
         genEl(context, &new_elem);
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
-   //     g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
 }
 
-scp_result copy_copying_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table/*, GHashTable *pattern_hash*/)
+scp_result copy_copying_const_set(sc_memory_context *context, scp_operand *set, GHashTable *table)
 {
     scp_operand arc1, elem, new_elem;
     scp_iterator3 *it;
@@ -123,7 +120,6 @@ scp_result copy_copying_const_set(sc_memory_context *context, scp_operand *set, 
         }
         genEl(context, &new_elem);
         g_hash_table_insert(table, MAKE_HASH(elem), MAKE_HASH(new_elem));
-  //      g_hash_table_steal(pattern_hash, MAKE_HASH(elem));
     }
     scp_iterator3_free(it);
     return SCP_RESULT_TRUE;
@@ -137,69 +133,203 @@ gboolean compare_keys(gpointer key, gpointer value, gpointer user_data)
         return FALSE;
 }
 
-sc_addr gen_copy(sc_memory_context *context, sc_addr elem, GHashTable *copies_hash, GHashTable *pattern_hash)
+sc_addr gen_copy_element(sc_memory_context *context, sc_addr elem, GHashTable *copies_hash)
 {
+    scp_operand op_test;
     gpointer result;
     result = g_hash_table_find(copies_hash, compare_keys, MAKE_SC_ADDR_HASH(elem));
     if (result != NULL)
     {
         return resolve_sc_addr_from_pointer(result);
-        //g_hash_table_steal(pattern_hash, MAKE_SC_ADDR_HASH(elem));
-        //return el;
     }
     if (SCP_RESULT_TRUE == check_type(context, elem, scp_type_node))
     {
+        printf("Gen node\n");
         sc_addr node;
         sc_type type;
-        if (FALSE == g_hash_table_contains(pattern_hash, MAKE_SC_ADDR_HASH(elem)))
-        {
-            result = g_hash_table_find(copies_hash, compare_keys, MAKE_SC_ADDR_HASH(elem));
-            if (result == NULL)
-            {
-                return elem;
-            }
-            else
-            {
-                return resolve_sc_addr_from_pointer(result);
-            }
-        }
         sc_memory_get_element_type(context, elem, &type);
         node = sc_memory_node_new(context, type);
+        op_test.addr = node;
+        printEl(context, &op_test);
         g_hash_table_insert(copies_hash, MAKE_SC_ADDR_HASH(elem), MAKE_SC_ADDR_HASH(node));
-        //g_hash_table_steal(pattern_hash, MAKE_SC_ADDR_HASH(elem));
         return node;
     }
     else
     {
+        printf("Gen arc\n");
         sc_addr begin, end, new_begin, new_end, new_arc;
         sc_type type;
         sc_memory_get_arc_begin(context, elem, &begin);
         sc_memory_get_arc_end(context, elem, &end);
-        new_begin = gen_copy(context, begin, copies_hash, pattern_hash);
-        new_end = gen_copy(context, end, copies_hash, pattern_hash);
+        new_begin = gen_copy_element(context, begin, copies_hash);
+        new_end = gen_copy_element(context, end, copies_hash);
         sc_memory_get_element_type(context, elem, &type);
         new_arc = sc_memory_arc_new(context, type, new_begin, new_end);
+        op_test.addr = new_arc;
+        printEl(context, &op_test);
         g_hash_table_insert(copies_hash, MAKE_SC_ADDR_HASH(elem), MAKE_SC_ADDR_HASH(new_arc));
-        //g_hash_table_steal(pattern_hash, MAKE_SC_ADDR_HASH(elem));
         return new_arc;
     }
 }
 
+void gen_copy_modifier_arc(sc_memory_context *context,sc_addr arc, sc_addr begin, GHashTable *copies_hash) {
+    scp_operand op_test;
+    sc_addr end, new_end, new_arc;
+    sc_type type;
+    c_memory_get_arc_end(context, arc, &end);
+    new_end = gen_copy_element(context, end, copies_hash);
+    sc_memory_get_element_type(context, arc, &type);
+    new_arc = sc_memory_arc_new(context, type, begin, new_end);
+    op_test.addr = new_arc;
+    printEl(context, &op_test);
+    g_hash_table_insert(copies_hash, MAKE_SC_ADDR_HASH(arc), MAKE_SC_ADDR_HASH(new_arc));
+}
+
+scp_result gen_copy(sc_memory_context *context, scp_operand *operator_set, scp_operand *parameter_set, GHashTable *copies_hash) {
+    scp_operand arc1, arc2, operator_arc, curr_operator, operator_type, operator_input, operand_arc, curr_operand, modifier, modifier_arc, operand_arc_pattern;
+    scp_iterator3 *it, *it1, *it2;
+    scp_bool order_rel;
+
+    MAKE_DEFAULT_ARC_ASSIGN(operator_arc);
+    MAKE_DEFAULT_ARC_ASSIGN(operand_arc);
+    MAKE_DEFAULT_ARC_ASSIGN(arc1);
+    MAKE_DEFAULT_ARC_ASSIGN(arc2);
+    MAKE_DEFAULT_ARC_ASSIGN(modifier_arc);
+    modifier_arc.erase = SCP_TRUE;
+    MAKE_DEFAULT_OPERAND_ASSIGN(curr_operator);
+    MAKE_DEFAULT_OPERAND_ASSIGN(operator_type);
+    MAKE_DEFAULT_OPERAND_ASSIGN(operator_input);
+    MAKE_DEFAULT_OPERAND_ASSIGN(curr_operand);
+    MAKE_DEFAULT_OPERAND_ASSIGN(modifier);
+    MAKE_DEFAULT_OPERAND_ASSIGN(operand_arc_pattern);
+    operand_arc_pattern.element_type = scp_type_arc_common | scp_type_const;
+
+
+    it = scp_iterator3_new(context, operator_set, &operator_arc, &curr_operator);
+    while(SCP_RESULT_TRUE == scp_iterator3_next(context, it, operator_set, &operator_arc, &curr_operator)) {
+        curr_operator.param_type = SCP_FIXED;
+        operator_arc.param_type = SCP_FIXED;
+
+        gen_copy_element(context, curr_operator.addr, copies_hash);
+        gen_copy_element(context, operator_arc.addr, copies_hash);
+
+        if (SCP_RESULT_TRUE == searchElStr3(context, &rrel_init, &arc1, &operator_arc)) {
+            gen_copy_modifier_arc(context, arc1.addr, rrel_init.addr, copies_hash);
+        }
+
+        operator_type.param_type = SCP_ASSIGN;
+        operator_input.param_type = SCP_ASSIGN;
+        it1 = scp_iterator3_new(context, &operator_input, &arc1, &curr_operator);
+        while (SCP_RESULT_TRUE == scp_iterator3_next(context, it1, &operator_input, &arc1, &curr_operator))
+        {
+            operator_input.param_type = SCP_FIXED;
+
+            if (SCP_RESULT_TRUE == searchElStr3(context, &scp_operator_atomic_type, &arc2, &operator_input))
+            {
+                gen_copy_element(context, arc1.addr, copies_hash);
+                operator_type.addr = operator_input.addr;
+                operator_input.param_type = SCP_ASSIGN;
+                continue;
+            }
+
+            operator_input.param_type = SCP_ASSIGN;
+        }
+        scp_iterator3_free(it1);
+        operator_type.param_type = SCP_FIXED;
+
+        // Operands loop
+        it1 = scp_iterator3_new(context, &curr_operator, &operand_arc, &curr_operand);
+        while (SCP_RESULT_TRUE == scp_iterator3_next(context, it1, &curr_operator, &operand_arc, &curr_operand))
+        {
+            curr_operand.param_type = SCP_FIXED;
+            operand_arc.param_type = SCP_FIXED;
+
+            order_rel = SCP_FALSE;
+
+            operand_arc_pattern.addr = operand_arc.addr;
+            if (SCP_TRUE == ifType(context, &operand_arc_pattern))
+            {
+                if (SCP_TRUE != searchElStr3(context, operator_set, &arc1, &curr_operand))
+                {
+                    operand_arc.param_type = SCP_ASSIGN;
+                    curr_operand.param_type = SCP_ASSIGN;
+                    continue;
+                }
+                else
+                {
+                    order_rel = SCP_TRUE;
+                }
+            }
+
+            gen_copy_element(context, curr_operand.addr, copies_hash);
+            gen_copy_element(context, operand_arc.addr, copies_hash);
+
+
+            // Operand modifiers loop
+            it2 = scp_iterator3_new(context, &modifier, &modifier_arc, &operand_arc);
+            while (SCP_RESULT_TRUE == scp_iterator3_next(context, it2, &modifier, &modifier_arc, &operand_arc))
+            {
+                modifier.param_type = SCP_FIXED;
+                modifier_arc.param_type = SCP_FIXED;
+                if (SCP_TRUE == order_rel)
+                {
+                    if (SCP_TRUE == ifCoin(context, &nrel_goto, &modifier)
+                        || SCP_TRUE == ifCoin(context, &nrel_else, &modifier)
+                        || SCP_TRUE == ifCoin(context, &nrel_then, &modifier)
+                        || SCP_TRUE == ifCoin(context, &nrel_error, &modifier))
+                    {
+                        gen_copy_modifier_arc(context, arc1.addr, modifier_arc.addr, copies_hash);
+                        modifier_arc.param_type = SCP_ASSIGN;
+                        modifier.param_type = SCP_ASSIGN;
+                        break;
+                    }
+                    else
+                    {
+                        modifier_arc.param_type = SCP_ASSIGN;
+                        modifier.param_type = SCP_ASSIGN;
+                        continue;
+                    }
+                }
+                if (SCP_RESULT_TRUE == ifCoin(context, &rrel_scp_var, &modifier) && SCP_RESULT_TRUE != searchElStr5(context, parameter_set, &arc1, &curr_operand, &arc2, &rrel_in)) {       //!!!!!!!!!!
+                    gen_copy_modifier_arc(context, arc1.addr, modifier_arc.addr, copies_hash);
+                }
+                else {
+                    gen_copy_modifier_arc(context, arc1.addr, modifier_arc.addr, copies_hash);
+                }
+
+                modifier_arc.param_type = SCP_ASSIGN;
+                modifier.param_type = SCP_ASSIGN;
+                printf("Output from modifier\n");
+            }
+            scp_iterator3_free(it2);
+
+            operand_arc.param_type = SCP_ASSIGN;
+            curr_operand.param_type = SCP_ASSIGN;
+            printf("Output from curr_operand\n");
+       }
+       scp_iterator3_free(it1);
+
+       operator_arc.param_type = SCP_ASSIGN;
+       curr_operator.param_type = SCP_ASSIGN;
+       printf("Output from curr_operator\n");
+    }
+    scp_iterator3_free(it);
+    return SCP_TRUE;
+}
+
 sc_result create_scp_process(const sc_event *event, sc_addr arg)
 {
-    scp_operand arc1, arc2, arc3, scp_procedure_node, vars_set, consts_set, params_set, copying_pattern,
-                scp_process_node, node1, question_node, call_parameters, init_operator;
-    GHashTable *copies_hash, *pattern_hash;
-    GHashTableIter iter;
-    gpointer key, value;
+    scp_operand arc1, arc2, arc3, scp_procedure_node, vars_set, consts_set, params_set,
+                scp_process_node, node1, question_node, call_parameters, init_operator, scp_procedure_operators;
+    GHashTable *copies_hash;
     scp_iterator5 *it;
     sc_char init_flag = SC_TRUE;
     copies_hash = g_hash_table_new(NULL, NULL);
-    pattern_hash = g_hash_table_new(NULL, NULL);
 
     MAKE_DEFAULT_OPERAND_FIXED(arc1);
     MAKE_DEFAULT_ARC_ASSIGN(arc2);
     MAKE_DEFAULT_OPERAND_ASSIGN(scp_procedure_node);
+    MAKE_DEFAULT_OPERAND_ASSIGN(scp_procedure_operators);
     MAKE_DEFAULT_OPERAND_FIXED(scp_process_node);
     arc1.addr = arg;
     arc1.element_type = scp_type_arc_pos_const_perm;
@@ -272,29 +402,26 @@ sc_result create_scp_process(const sc_event *event, sc_addr arg)
     if(SCP_RESULT_TRUE == searchElStr5(s_default_ctx, &scp_procedure_node, &arc2, &params_set, &arc2, &rrel_params)) {
         params_set.param_type = SCP_FIXED;
     }
-    MAKE_DEFAULT_OPERAND_ASSIGN(copying_pattern);
-    if(SCP_RESULT_TRUE == searchElStr5(s_default_ctx, &scp_procedure_node, &arc3, &copying_pattern, &arc2, &nrel_template_of_scp_process_creation)) {
-        copying_pattern.param_type = SCP_FIXED;
+    if(SCP_RESULT_TRUE ==  searchElStr5(s_default_ctx, &scp_procedure_node, &arc1, &scp_procedure_operators, &arc2, &rrel_operators)) {
+        scp_procedure_operators.param_type = SCP_FIXED;
     }
     else {
         return SC_RESULT_ERROR;
     }
 
-    load_set_to_hash(s_default_ctx, &copying_pattern, pattern_hash);
-
-    if (SCP_RESULT_TRUE != copy_parameter_set(s_default_ctx, &params_set, &call_parameters, copies_hash/*, pattern_hash*/))
+    if (SCP_RESULT_TRUE != copy_parameter_set(s_default_ctx, &params_set, &call_parameters, copies_hash))
     {
         return SC_RESULT_OK;
     }
-    if (SCP_RESULT_TRUE != copy_var_set(s_default_ctx, &vars_set, copies_hash/*, pattern_hash*/))
+    if (SCP_RESULT_TRUE != copy_var_set(s_default_ctx, &vars_set, copies_hash))
     {
         return SC_RESULT_OK;
     }
-    if (SCP_RESULT_TRUE != copy_copying_const_set(s_default_ctx, &vars_set, copies_hash/*, pattern_hash*/))
+    if (SCP_RESULT_TRUE != copy_copying_const_set(s_default_ctx, &vars_set, copies_hash))
     {
         return SC_RESULT_OK;
     }
-    if (SCP_RESULT_TRUE != copy_const_set(s_default_ctx, &consts_set, copies_hash/*, pattern_hash*/))
+    if (SCP_RESULT_TRUE != copy_const_set(s_default_ctx, &consts_set, copies_hash))
     {
         return SC_RESULT_OK;
     }
@@ -302,29 +429,21 @@ sc_result create_scp_process(const sc_event *event, sc_addr arg)
     MAKE_COMMON_ARC_ASSIGN(arc1);
     MAKE_DEFAULT_ARC_ASSIGN(arc2);
     MAKE_DEFAULT_NODE_ASSIGN(scp_process_node);
-    scp_procedure_node.param_type = SCP_FIXED;
     if(SCP_RESULT_TRUE == genElStr5(s_default_ctx, &question_node, &arc1, &scp_process_node, &arc2, &nrel_scp_process)) {
         scp_process_node.param_type = SCP_FIXED;
     }
+
     MAKE_DEFAULT_ARC_ASSIGN(arc1);
     genElStr3(s_default_ctx, &scp_process, &arc1, &scp_process_node);
+    printEl(s_default_ctx, &scp_process_node);
 
-    searchElStr5(s_default_ctx, &scp_procedure_node, &arc1, &node1, &arc2, &rrel_operators);
+    g_hash_table_insert(copies_hash, MAKE_HASH(scp_procedure_operators), MAKE_HASH(scp_process_node));
 
-    g_hash_table_insert(copies_hash, MAKE_HASH(node1), MAKE_HASH(scp_process_node));
-    g_hash_table_steal(pattern_hash, MAKE_HASH(node1));
-
-    g_hash_table_iter_init(&iter, pattern_hash);
-    while (TRUE == g_hash_table_iter_next(&iter, &key, &value))
-    {
-        gen_copy(s_default_ctx, resolve_sc_addr_from_pointer(key), copies_hash, pattern_hash);
-    }
+   if(SCP_RESULT_TRUE != gen_copy(s_default_ctx, &scp_procedure_operators, &params_set, copies_hash)) {
+       return SC_RESULT_ERROR;
+   }
 
     g_hash_table_destroy(copies_hash);
-    g_hash_table_destroy(pattern_hash);
-
-    // Start process interpreting
-    //printf("PROCESS CREATED. INTERPRETING...\n");
 
     MAKE_DEFAULT_OPERAND_ASSIGN(init_operator);
     it = scp_iterator5_new(s_default_ctx, &scp_process_node, &arc1, &init_operator, &arc2, &rrel_init);
